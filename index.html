@@ -1974,52 +1974,100 @@
     });
   }
 
-  window.openAIAssistant = () => {
-    document.getElementById('aiModal').classList.add('active');
-  };
+  // ====== OpenAI Chat Integration ======
+const OPENAI_API_KEY = "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";
 
-  window.closeAIAssistant = () => {
-    document.getElementById('aiModal').classList.remove('active');
-  };
+// function to talk to OpenAI
+async function sendMessageToOpenAI(userMessage) {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4",
+      messages: [{ role: "user", content: userMessage }]
+    })
+  });
 
-  window.sendMessage = () => {
-    const input = document.getElementById('aiInputField');
-    const message = input.value.trim();
-    if (!message) return;
+  if (!res.ok) {
+    throw new Error(`OpenAI API error: ${res.statusText}`);
+  }
 
-    const chat = document.getElementById('aiChat');
-    
-    // Add user message
-    const userMsg = document.createElement('div');
-    userMsg.className = 'ai-message user';
-    userMsg.innerHTML = `<strong>Jinudev:</strong> ${message}`;
-    chat.appendChild(userMsg);
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
 
-    // Generate AI response
-    let response = aiResponses.default;
-    Object.keys(aiResponses).forEach(key => {
-      if (message.toLowerCase().includes(key)) {
-        response = aiResponses[key];
+// Modal controls
+window.openAIAssistant = () => {
+  document.getElementById('aiModal').classList.add('active');
+};
+window.closeAIAssistant = () => {
+  document.getElementById('aiModal').classList.remove('active');
+};
+
+// Enhanced message handler with OpenAI priority
+window.sendMessage = async () => {
+  const input = document.getElementById('aiInputField');
+  const message = input.value.trim();
+  if (!message) return;
+
+  const chat = document.getElementById('aiChat');
+
+  // add user message to UI
+  const userMsg = document.createElement('div');
+  userMsg.className = 'ai-message user';
+  userMsg.innerHTML = `<strong>You:</strong> ${message}`;
+  chat.appendChild(userMsg);
+
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+
+  // loading indicator
+  const loadingMsg = document.createElement('div');
+  loadingMsg.className = 'ai-message assistant';
+  loadingMsg.innerHTML = `<span class="loading"></span> Processing your request...`;
+  chat.appendChild(loadingMsg);
+  chat.scrollTop = chat.scrollHeight;
+
+    try {
+      // First try OpenAI
+      let reply;
+      try {
+        // Add business context to the prompt
+        const enhancedPrompt = `As an AI business partner for PowerAura Solar Solutions in Hyderabad, helping achieve ₹150 crore goal. Context: Solar business, focusing on residential and commercial installations. Current target: ₹8.5L monthly revenue. Question: ${message}`;
+        reply = await sendMessageToOpenAI(enhancedPrompt);
+      } catch (openAIError) {
+        console.error('OpenAI Error:', openAIError);
+        // Fallback to predefined responses if OpenAI fails
+        const lowerMessage = message.toLowerCase();
+        for (const [key, value] of Object.entries(aiResponses)) {
+          if (lowerMessage.includes(key)) {
+            reply = value;
+            break;
+          }
+        }
+        if (!reply) reply = aiResponses.default;
       }
-    });
 
-    // Add context-aware responses
-    if (message.toLowerCase().includes('jinudev') || message.toLowerCase().includes('partner')) {
-      response = `Absolutely, Jinudev! ${response} Remember, we're in this together - every challenge is an opportunity to grow your solar empire in Hyderabad! 💪`;
-    }
+      // Add personalization for Jinudev if not already present
+      if (!reply.includes('Jinudev') && (message.toLowerCase().includes('jinudev') || message.toLowerCase().includes('partner'))) {
+        reply = `Jinudev, ${reply} Remember, we're building PowerAura Solar together! �`;
+      }    // replace loading with reply
+    loadingMsg.innerHTML = `<strong>🤖 AI:</strong> ${reply}`;
+  } catch (err) {
+    console.error(err);
+    loadingMsg.innerHTML = `<strong>🤖 AI:</strong> I apologize, but I couldn't process that request. Please try again.`;
+  }
 
-    // Add AI response with delay
-    setTimeout(() => {
-      const aiMsg = document.createElement('div');
-      aiMsg.className = 'ai-message assistant';
-      aiMsg.innerHTML = `<strong>🤖 Your AI Partner:</strong> ${response}`;
-      chat.appendChild(aiMsg);
-      chat.scrollTop = chat.scrollHeight;
-    }, 1000);
+  chat.scrollTop = chat.scrollHeight;
+};
 
-    input.value = '';
-    chat.scrollTop = chat.scrollHeight;
-  };
+// allow pressing Enter to send
+document.getElementById('aiInputField').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
 
   // Initialize when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
