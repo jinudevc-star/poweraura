@@ -1,678 +1,2034 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PowerAura Solar Calculator</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="icon" href="https://img.icons8.com/fluency/48/solar-panel.png" />
-  <style>
-    :root {
-      --primary: #0A9A73;
-      --secondary: #FFC107;
-      --accent: #1E88E5;
-      --dark: #0c1a25;
-      --light: #f0f8ff;
-      --neon: #00f7ff;
-      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerAura Solar - Business Intelligence Dashboard | Jinudev.C</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0a7a07;
+    --primary-dark: #074b04;
+    --secondary: #ff9800;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+    --dark: #1f2937;
+    --light: #f8fafc;
+    --border: #e5e7eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e6 100%);
+    color: var(--dark); 
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Main Layout */
+  .dashboard-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+  }
+
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #fff, #a7f3d0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+  }
+
+  .owner-info {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+  }
+
+  .owner-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .owner-contact {
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .nav-menu {
+    padding: 20px 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover, .nav-item.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-left-color: var(--secondary);
+  }
+
+  .nav-item i {
+    width: 20px;
+    margin-right: 12px;
+    font-size: 1.1rem;
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: 280px;
+    background: var(--light);
+    min-height: 100vh;
+  }
+
+  /* Top Header */
+  .top-header {
+    background: white;
+    padding: 20px 30px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  .header-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  .ai-assistant {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(45deg, var(--primary), var(--success));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(10, 122, 7, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(10, 122, 7, 0); }
+  }
+
+  .contact-banner {
+    background: linear-gradient(45deg, var(--info), var(--primary));
+    color: white;
+    padding: 8px 30px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .contact-banner a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Dashboard Content */
+  .dashboard-content {
+    padding: 30px;
+  }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, var(--primary), transparent);
+    opacity: 0.1;
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+  }
+
+  .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .metric-title {
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+  }
+
+  .metric-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .metric-change {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .metric-change.positive { color: var(--success); }
+  .metric-change.negative { color: var(--error); }
+
+  /* Tables */
+  .data-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 30px;
+  }
+
+  .table-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+  }
+
+  .table-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: #e5e7eb;
+    color: var(--dark);
+  }
+
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+
+  .btn-warning {
+    background: var(--warning);
+    color: white;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 15px 25px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tr:hover {
+    background: #f8f9fa;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-new { background: #dbeafe; color: #1e40af; }
+  .status-qualified { background: #d1fae5; color: #065f46; }
+  .status-proposal { background: #fef3c7; color: #92400e; }
+  .status-approved { background: #dcfce7; color: #166534; }
+  .status-installed { background: #e0e7ff; color: #3730a3; }
+  .status-completed { background: #d1fae5; color: #065f46; }
+
+  /* Charts */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+  }
+
+  .chart-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 20px;
+  }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(10, 122, 7, 0.1);
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+  }
+
+  /* AI Assistant Modal */
+  .ai-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-modal.active {
+    display: flex;
+  }
+
+  .ai-modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-modal-header {
+    padding: 25px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(45deg, var(--primary), var(--success));
+    color: white;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .ai-chat {
+    padding: 25px;
+    height: 400px;
+    overflow-y: auto;
+  }
+
+  .ai-message {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 80%;
+  }
+
+  .ai-message.user {
+    background: #e5f3ff;
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .ai-message.assistant {
+    background: #f0f9f0;
+    border-left: 4px solid var(--primary);
+  }
+
+  .ai-input {
+    padding: 20px 25px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+
+  .ai-input input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+  }
+
+  /* Progress Tracker */
+  .progress-tracker {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
+  }
+
+  .progress-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    background: white;
+    padding: 0 10px;
+  }
+
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.3s ease;
+  }
+
+  .step-circle.completed {
+    background: var(--success);
+    color: white;
+  }
+
+  .step-circle.current {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(10, 122, 7, 0.2);
+  }
+
+  .step-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  /* Dashboard specific content visibility */
+  .dashboard-section {
+    display: none;
+  }
+
+  .dashboard-section.active {
+    display: block;
+  }
+
+  /* Lead generation form */
+  .lead-form {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+
+  /* Inventory cards */
+  .inventory-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--info);
+  }
+
+  .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .inventory-name {
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  .inventory-stock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .stock-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .stock-high { background: var(--success); }
+  .stock-medium { background: var(--warning); }
+  .stock-low { background: var(--error); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    .sidebar.mobile-open {
+      transform: translateX(0);
     }
 
-    body {
-      font-family: 'Montserrat', sans-serif;
-      color: #e0f7ff;
-      background: linear-gradient(135deg, #0c1a25 0%, #0a2a3e 100%);
-      line-height: 1.7;
-      overflow-x: hidden;
-      position: relative;
-      min-height: 100vh;
+    .main-content {
+      margin-left: 0;
+    }
+
+    .dashboard-content {
       padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-          radial-gradient(circle at 20% 30%, rgba(10, 154, 115, 0.1) 0%, transparent 40%),
-          radial-gradient(circle at 80% 70%, rgba(30, 136, 229, 0.1) 0%, transparent 40%);
-      z-index: -1;
+    .cards-grid {
+      grid-template-columns: 1fr;
     }
 
-    h1, h2, h3, h4, h5 {
-      font-family: 'Exo 2', sans-serif;
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: 0.5px;
+    .charts-grid {
+      grid-template-columns: 1fr;
     }
 
-    .container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
+    th, td {
+      padding: 10px;
+      font-size: 0.9rem;
     }
-
-    /* Header Styling */
-    .logo {
-      text-align: center;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .logo h1 {
-      font-size: 32px;
-      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(10, 154, 115, 0.3);
-    }
-
-    .logo span {
-      color: var(--neon);
-    }
-
-    /* Calculator Card */
-    .calculator-card {
-      background: rgba(12, 30, 46, 0.8);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(0, 247, 255, 0.1);
-      backdrop-filter: blur(10px);
-      margin-bottom: 30px;
-      transform: translateY(0);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .calculator-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 50px rgba(0, 247, 255, 0.2);
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 25px;
-      color: white;
-      position: relative;
-      padding-bottom: 15px;
-    }
-
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: var(--primary);
-      border-radius: 2px;
-    }
-
-    .input-group {
-      margin-bottom: 25px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 600;
-      color: var(--neon);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .input-group input, .input-group select {
-      width: 100%;
-      padding: 14px 20px;
-      background: rgba(0, 20, 40, 0.5);
-      border: 1px solid rgba(0, 247, 255, 0.2);
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      transition: var(--transition);
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .input-group input:focus, .input-group select:focus {
-      outline: none;
-      border-color: var(--neon);
-      box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
-    }
-
-    .slider-container {
-      background: rgba(0, 20, 40, 0.3);
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-      outline: none;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
-      background: var(--neon);
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 247, 255, 0.6);
-      border: 2px solid white;
-      transition: all 0.2s ease;
-    }
-
-    input[type=range]::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
-      box-shadow: 0 0 15px rgba(0, 247, 255, 0.8);
-    }
-
-    .slider-value {
-      margin-top: 10px;
-      text-align: center;
-      font-weight: 600;
-      color: var(--secondary);
-      font-size: 18px;
-    }
-
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 16px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 18px;
-      transition: var(--transition);
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      font-family: 'Exo 2', sans-serif;
-      letter-spacing: 1px;
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-      margin-top: 20px;
-      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      box-shadow: 0 5px 20px rgba(10, 154, 115, 0.4);
-    }
-
-    .btn:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(10, 154, 115, 0.6);
-    }
-
-    /* Results Section */
-    .results-card {
-      background: rgba(12, 30, 46, 0.8);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(0, 247, 255, 0.1);
-      backdrop-filter: blur(10px);
-      display: none;
-      transform: translateY(0);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .results-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 50px rgba(0, 247, 255, 0.2);
-    }
-
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .result-box {
-      background: rgba(10, 154, 115, 0.15);
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-      border-left: 4px solid var(--primary);
-      transition: all 0.5s ease;
-      transform: translateY(0);
-    }
-
-    .result-box:hover {
-      transform: translateY(-5px);
-      background: rgba(10, 154, 115, 0.25);
-    }
-
-    .result-label {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: var(--neon);
-      font-weight: 600;
-    }
-
-    .result-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .savings-box {
-      grid-column: 1 / -1;
-      background: rgba(255, 193, 7, 0.15);
-      border-left: 4px solid var(--secondary);
-    }
-
-    .savings-box:hover {
-      background: rgba(255, 193, 7, 0.25);
-    }
-
-    .savings-box .result-label {
-      color: var(--secondary);
-    }
-
-    .savings-box .result-value {
-      font-size: 32px;
-      color: #FFD700;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #a0c6d9;
-      font-size: 14px;
-      padding: 20px;
-    }
-
-    footer p {
-      margin-top: 10px;
-    }
-
-    .company {
-      color: var(--neon);
-      font-weight: 600;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .calculator-card, .results-card {
-        padding: 20px;
-      }
-      
-      .results-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .logo h1 {
-        font-size: 24px;
-      }
-    }
-
-    /* Animation */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.8s ease forwards;
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-    
-    .solar-graphic {
-      text-align: center;
-      margin: 20px 0;
-    }
-    
-    .solar-graphic i {
-      font-size: 60px;
-      color: var(--secondary);
-      text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">
-      <i class="fas fa-solar-panel fa-2x" style="color: var(--secondary);"></i>
-      <h1>Power<span>Aura</span></h1>
+
+<!-- Contact Banner -->
+<div class="contact-banner">
+  <i class="fas fa-phone"></i> Call Jinudev.C for Solar Solutions: <a href="tel:+918143351265">+91 8143 351 265</a> | Hyderabad's Leading Solar Expert
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">PowerAura</div>
+    <div style="font-size: 0.9rem; opacity: 0.8;">Solar Business Intelligence</div>
+    <div class="owner-info">
+      <div class="owner-name">Jinudev.C</div>
+      <div class="owner-contact">
+        <i class="fas fa-phone"></i>
+        <span>+91 8143 351 265</span>
+      </div>
+      <div style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;">Founder & CEO</div>
     </div>
-    
-    <div class="section-title">
-      Solar Energy Calculator
-      <div class="text-sm font-normal mt-2 text-gray-400">For Andhra, Telangana, TN, Karnataka & Kerala</div>
-    </div>
-    
-    <div class="solar-graphic pulse">
-      <i class="fas fa-sun"></i>
-      <i class="fas fa-bolt"></i>
+  </div>
+  <nav class="nav-menu">
+    <a href="#" class="nav-item active" data-section="overview">
+      <i class="fas fa-chart-line"></i>
+      <span>Business Overview</span>
+    </a>
+    <a href="#" class="nav-item" data-section="leads">
+      <i class="fas fa-users"></i>
+      <span>Lead Management</span>
+    </a>
+    <a href="#" class="nav-item" data-section="projects">
       <i class="fas fa-solar-panel"></i>
+      <span>Project Pipeline</span>
+    </a>
+    <a href="#" class="nav-item" data-section="installations">
+      <i class="fas fa-tools"></i>
+      <span>Installation Tracking</span>
+    </a>
+    <a href="#" class="nav-item" data-section="inventory">
+      <i class="fas fa-boxes"></i>
+      <span>Inventory Management</span>
+    </a>
+    <a href="#" class="nav-item" data-section="finance">
+      <i class="fas fa-rupee-sign"></i>
+      <span>Financial Analytics</span>
+    </a>
+    <a href="#" class="nav-item" data-section="customer">
+      <i class="fas fa-star"></i>
+      <span>Customer Success</span>
+    </a>
+    <a href="#" class="nav-item" data-section="ai-insights">
+      <i class="fas fa-brain"></i>
+      <span>AI Insights</span>
+    </a>
+    <a href="#" class="nav-item" data-section="settings">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Top Header -->
+  <header class="top-header">
+    <div>
+      <h1 class="header-title" id="pageTitle">Business Overview</h1>
+      <div class="header-subtitle">Hyderabad Operations Center - August 2025</div>
     </div>
-    
-    <div class="calculator-card fade-in">
-      <div class="input-group">
-        <label><i class="fas fa-map-marker-alt"></i> Select State</label>
-        <select id="state" class="w-full p-2 border rounded">
-          <option>Andhra Pradesh</option>
-          <option>Telangana</option>
-          <option>Tamil Nadu</option>
-          <option>Karnataka</option>
-          <option>Kerala</option>
-        </select>
-      </div>
-      
-      <div class="input-group">
-        <label><i class="fas fa-bolt"></i> Annual Usage</label>
-        <div style="display: flex; gap: 10px;">
-          <input type="number" id="annualUsage" class="w-full p-2 border rounded" style="flex: 3;" placeholder="e.g. 10000" />
-          <select id="usageUnit" class="border rounded" style="flex: 1; padding: 14px 20px; background: rgba(0, 20, 40, 0.5); color: white; border: 1px solid rgba(0, 247, 255, 0.2);" onchange="handleUnitChange(this.value)">
-            <option value="W">Watt (W)</option>
-            <option value="kW" selected>Kilowatt (kW)</option>
-            <option value="MW">Megawatt (MW)</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="input-group">
-        <label><i class="fas fa-solar-panel"></i> Panel Wattage</label>
-        <div style="display: flex; gap: 10px;">
-          <select id="panelWattageSelect" class="w-full p-2 border rounded" style="flex: 2;" onchange="handleWattageChange(this.value)">
-            <option value="500">500 W (Poly)</option>
-            <option value="535">535 W (Mono)</option>
-            <option value="545">545 W (Mono PERC)</option>
-            <option value="600" selected>600 W (HJT)</option>
-            <option value="650">650 W (TOPCon)</option>
-            <option value="700">700 W (HJT+)</option>
-            <option value="750">750 W (Bifacial)</option>
-            <option value="custom">Custom Wattage...</option>
-          </select>
-          <input type="number" id="customWattage" class="w-full p-2 border rounded" style="flex: 1; display: none;" 
-                 placeholder="Enter watts" min="100" max="1000" step="5"
-                 onchange="validateCustomWattage(this.value)"/>
-        </div>
-        <div id="wattageError" style="color: #ff6b6b; font-size: 12px; margin-top: 5px; display: none;">
-          Please enter a value between 100W and 1000W
-        </div>
-      </div>
-      
-      <div class="input-group">
-        <label><i class="fas fa-sun"></i> Peak Sun Hours</label>
-        <div class="slider-container">
-          <input type="range" id="peakSunHours" min="1" max="8" step="0.1" value="5" />
-          <div class="slider-value" id="peakSunHoursValue">5 hours</div>
-        </div>
-      </div>
-      
-      <div class="input-group">
-        <label><i class="fas fa-cogs"></i> System Efficiency</label>
-        <div class="slider-container">
-          <input type="range" id="systemEfficiency" min="70" max="100" step="1" value="85" />
-          <div class="slider-value" id="systemEfficiencyValue">85%</div>
-        </div>
-      </div>
-      
-      <div class="input-group">
-        <label><i class="fas fa-rupee-sign"></i> Electricity Rate</label>
-        <div class="slider-container">
-          <input type="range" id="unitRate" min="3" max="12" step="0.1" value="6" />
-          <div class="slider-value" id="unitRateValue">₹6.00 per unit</div>
-        </div>
-      </div>
-      
-      <button id="calculateBtn" class="btn">
-        <i class="fas fa-calculator"></i> Calculate Solar Solution
-      </button>
+    <div class="ai-assistant" onclick="openAIAssistant()">
+      <i class="fas fa-robot"></i>
+      <span>Your AI Business Partner</span>
     </div>
-    
-    <div id="resultsSection" class="results-card fade-in">
-      <div class="section-title">
-        Your Solar Analysis
-        <div class="text-sm font-normal mt-2 text-gray-400">Optimized for your location and needs</div>
+  </header>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+
+    <!-- Business Overview Section -->
+    <div class="dashboard-section active" id="overview">
+      <!-- Progress Tracker -->
+      <div class="progress-tracker">
+        <h3 style="margin-bottom: 20px;">🎯 Journey to ₹150 Crore Target</h3>
+        <div class="progress-steps">
+          <div class="progress-step">
+            <div class="step-circle completed">✓</div>
+            <div class="step-title">Dashboard Ready</div>
+          </div>
+          <div class="progress-step">
+            <div class="step-circle current">2</div>
+            <div class="step-title">Domain & Launch</div>
+          </div>
+          <div class="progress-step">
+            <div class="step-circle">3</div>
+            <div class="step-title">First 50 Customers</div>
+          </div>
+          <div class="progress-step">
+            <div class="step-circle">4</div>
+            <div class="step-title">₹10 Cr Revenue</div>
+          </div>
+          <div class="progress-step">
+            <div class="step-circle">5</div>
+            <div class="step-title">Market Leader</div>
+          </div>
+        </div>
       </div>
-      
-      <div class="results-grid">
-        <div class="result-box">
-          <div class="result-label">Panels Needed</div>
-          <div class="result-value" id="panelCount">0</div>
+
+      <!-- Key Metrics -->
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Monthly Target Revenue</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-target"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹8.5L</div>
+          <div class="metric-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>Year 1 Goal - Let's achieve it!</span>
+          </div>
         </div>
-        
-        <div class="result-box">
-          <div class="result-label">System Size</div>
-          <div class="result-value" id="systemSize">0 kW</div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Hyderabad Market Size</div>
+            <div class="metric-icon" style="background: var(--info);">
+              <i class="fas fa-city"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹2,500Cr</div>
+          <div class="metric-change positive">
+            <i class="fas fa-chart-line"></i>
+            <span>Addressable market opportunity</span>
+          </div>
         </div>
-        
-        <div class="result-box">
-          <div class="result-label">Annual Production</div>
-          <div class="result-value" id="annualProduction">0 kWh</div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Target Conversion Rate</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-percentage"></i>
+            </div>
+          </div>
+          <div class="metric-value">18%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-bullseye"></i>
+            <span>Industry benchmark: 12%</span>
+          </div>
         </div>
-        
-        <div class="result-box">
-          <div class="result-label">Roof Space</div>
-          <div class="result-value" id="roofSpace">0 sq ft</div>
-        </div>
-        
-        <div class="result-box savings-box">
-          <div class="result-label">Estimated Annual Savings</div>
-          <div class="result-value" id="yearlySavings">₹0</div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Partnership Status</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-handshake"></i>
+            </div>
+          </div>
+          <div class="metric-value">Active</div>
+          <div class="metric-change positive">
+            <i class="fas fa-robot"></i>
+            <span>AI Partner ready to guide</span>
+          </div>
         </div>
       </div>
-      
-      <div class="text-center mt-6">
-        <button class="btn" onclick="document.getElementById('resultsSection').classList.add('hidden')">
-          <i class="fas fa-redo"></i> Recalculate
+
+      <!-- Quick Actions -->
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">🚀 Next Action Items</h3>
+          <div class="table-actions">
+            <button class="btn btn-success" onclick="addQuickLead()">
+              <i class="fas fa-plus"></i> Add Quick Lead
+            </button>
+            <button class="btn btn-primary" onclick="openAIAssistant()">
+              <i class="fas fa-brain"></i> AI Strategy Session
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Action Item</th>
+              <th>Timeline</th>
+              <th>Status</th>
+              <th>AI Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="status-badge" style="background: #ef4444; color: white;">HIGH</span></td>
+              <td><strong>Launch domain & website</strong></td>
+              <td>Next 7 days</td>
+              <td><span class="status-badge status-new">In Progress</span></td>
+              <td>Choose premium .com domain for credibility</td>
+            </tr>
+            <tr>
+              <td><span class="status-badge" style="background: #f59e0b; color: white;">MED</span></td>
+              <td><strong>Generate first 10 leads</strong></td>
+              <td>Week 2-3</td>
+              <td><span class="status-badge status-new">Ready</span></td>
+              <td>Target Gachibowli apartments first</td>
+            </tr>
+            <tr>
+              <td><span class="status-badge" style="background: #10b981; color: white;">LOW</span></td>
+              <td><strong>Setup inventory tracking</strong></td>
+              <td>Month 1</td>
+              <td><span class="status-badge status-proposal">Planning</span></td>
+              <td>Partner with Adani Solar for panels</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lead Management Section -->
+    <div class="dashboard-section" id="leads">
+      <div class="lead-form">
+        <h3 style="margin-bottom: 20px;"><i class="fas fa-user-plus"></i> Quick Lead Entry</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input type="text" class="form-input" id="leadName" placeholder="Enter name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-input" id="leadPhone" placeholder="+91 XXXXX XXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Monthly Bill</label>
+            <input type="number" class="form-input" id="leadBill" placeholder="₹3,500">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div class="form-group">
+            <label class="form-label">Lead Source</label>
+            <select class="form-select" id="leadSource">
+              <option>Website</option>
+              <option>Google Ads</option>
+              <option>Referral</option>
+              <option>Social Media</option>
+              <option>Cold Call</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Property Type</label>
+            <select class="form-select" id="leadProperty">
+              <option>Individual House</option>
+              <option>Apartment</option>
+              <option>Commercial</option>
+              <option>Industrial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Area (Hyderabad)</label>
+            <select class="form-select" id="leadArea">
+              <option>Gachibowli</option>
+              <option>HITEC City</option>
+              <option>Banjara Hills</option>
+              <option>Jubilee Hills</option>
+              <option>Kondapur</option>
+              <option>Madhapur</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select class="form-select" id="leadPriority">
+              <option>High - Hot Lead</option>
+              <option>Medium - Interested</option>
+              <option>Low - Future</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="addLead()" style="width: 100%;">
+          <i class="fas fa-plus"></i> Add Lead & Calculate Solar Potential
         </button>
       </div>
-    </div>
-    
-    <footer>
-      <div>Developed by <span class="company">C. Jinudev</span></div>
-      <p>PowerAura Pvt Ltd - Pioneering Solar Innovation in Southern India</p>
-    </footer>
-  </div>
 
-  <script>
-    const stateRates = {
-      "Andhra Pradesh": 6.95,
-      "Telangana": 4.8,
-      "Tamil Nadu": 4.95,
-      "Karnataka": 6.95,
-      "Kerala": 7.6
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Total Leads</div>
+            <div class="metric-icon" style="background: var(--primary);">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="metric-value" id="totalLeads">0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-target"></i>
+            <span>Goal: 50 in Month 1</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Hot Leads</div>
+            <div class="metric-icon" style="background: var(--error);">
+              <i class="fas fa-fire"></i>
+            </div>
+          </div>
+          <div class="metric-value" id="hotLeads">0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-phone"></i>
+            <span>Ready to call</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Avg Deal Size</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-rupee-sign"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹2.8L</div>
+          <div class="metric-change positive">
+            <i class="fas fa-chart-line"></i>
+            <span>Target for Hyderabad</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Conversion Rate</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-percentage"></i>
+            </div>
+          </div>
+          <div class="metric-value" id="conversionRate">0%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-target"></i>
+            <span>Target: 18%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Lead Pipeline</h3>
+          <div class="table-actions">
+            <button class="btn btn-secondary">
+              <i class="fas fa-filter"></i> Filter by Area
+            </button>
+            <button class="btn btn-primary">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Area</th>
+              <th>Monthly Bill</th>
+              <th>Solar Potential</th>
+              <th>Priority</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTableBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
+                No leads yet. Add your first lead above! 🚀
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Installation Tracking Section -->
+    <div class="dashboard-section" id="installations">
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Active Installations</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-tools"></i>
+            </div>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-calendar"></i>
+            <span>Ready to schedule</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Completed Projects</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+          <div class="metric-value">0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-trophy"></i>
+            <span>Your success stories</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Avg Installation Time</div>
+            <div class="metric-icon" style="background: var(--info);">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+          <div class="metric-value">2 days</div>
+          <div class="metric-change positive">
+            <i class="fas fa-lightning-bolt"></i>
+            <span>Industry standard</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Customer Satisfaction</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <div class="metric-value">5.0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-heart"></i>
+            <span>Target rating</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Installation Pipeline</h3>
+          <div class="table-actions">
+            <button class="btn btn-primary">
+              <i class="fas fa-calendar-plus"></i> Schedule Installation
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>System Size</th>
+              <th>Installation Date</th>
+              <th>Team Assigned</th>
+              <th>Status</th>
+              <th>Progress</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
+                No installations scheduled yet. Convert your leads first! 💪
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Inventory Management Section -->
+    <div class="dashboard-section" id="inventory">
+      <div class="cards-grid">
+        <div class="inventory-item">
+          <div class="inventory-header">
+            <h4 class="inventory-name">Solar Panels (Mono-PERC)</h4>
+            <span class="status-badge status-new">In Stock</span>
+          </div>
+          <div class="inventory-stock">
+            <div class="stock-indicator stock-medium"></div>
+            <span><strong>50 units</strong> - 400W each</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #6b7280;">₹21/watt • Adani Solar • 25yr warranty</p>
+          <div style="margin-top: 15px;">
+            <button class="btn btn-primary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-plus"></i> Add Stock
+            </button>
+            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-minus"></i> Use Stock
+            </button>
+          </div>
+        </div>
+
+        <div class="inventory-item">
+          <div class="inventory-header">
+            <h4 class="inventory-name">String Inverters</h4>
+            <span class="status-badge status-approved">Good Stock</span>
+          </div>
+          <div class="inventory-stock">
+            <div class="stock-indicator stock-high"></div>
+            <span><strong>25 units</strong> - 5kW each</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #6b7280;">₹35,000 each • Fronius • 10yr warranty</p>
+          <div style="margin-top: 15px;">
+            <button class="btn btn-primary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-plus"></i> Add Stock
+            </button>
+            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-minus"></i> Use Stock
+            </button>
+          </div>
+        </div>
+
+        <div class="inventory-item">
+          <div class="inventory-header">
+            <h4 class="inventory-name">Lithium Batteries</h4>
+            <span class="status-badge" style="background: #ef4444; color: white;">Low Stock</span>
+          </div>
+          <div class="inventory-stock">
+            <div class="stock-indicator stock-low"></div>
+            <span><strong>8 units</strong> - 100Ah each</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #6b7280;">₹75,000 each • 48V • 9yr warranty</p>
+          <div style="margin-top: 15px;">
+            <button class="btn btn-warning" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-shopping-cart"></i> Order Now
+            </button>
+            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-minus"></i> Use Stock
+            </button>
+          </div>
+        </div>
+
+        <div class="inventory-item">
+          <div class="inventory-header">
+            <h4 class="inventory-name">Mounting Structure</h4>
+            <span class="status-badge status-approved">Available</span>
+          </div>
+          <div class="inventory-stock">
+            <div class="stock-indicator stock-high"></div>
+            <span><strong>100 sets</strong> - Aluminum</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #6b7280;">₹8,000/set • Corrosion resistant</p>
+          <div style="margin-top: 15px;">
+            <button class="btn btn-primary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-plus"></i> Add Stock
+            </button>
+            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
+              <i class="fas fa-minus"></i> Use Stock
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Supplier Information</h3>
+          <div class="table-actions">
+            <button class="btn btn-primary">
+              <i class="fas fa-truck"></i> Place Order
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Lead Time</th>
+              <th>Minimum Order</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Adani Solar</strong></td>
+              <td>Mono-PERC 400W Panels</td>
+              <td>₹21/watt</td>
+              <td>7-10 days</td>
+              <td>50 panels</td>
+              <td>+91 XXXXX XXXXX</td>
+            </tr>
+            <tr>
+              <td><strong>Tata Power Solar</strong></td>
+              <td>String Inverters 5kW</td>
+              <td>₹35,000 each</td>
+              <td>5-7 days</td>
+              <td>10 units</td>
+              <td>+91 XXXXX XXXXX</td>
+            </tr>
+            <tr>
+              <td><strong>Luminous</strong></td>
+              <td>Lithium Batteries</td>
+              <td>₹75,000 each</td>
+              <td>10-14 days</td>
+              <td>5 units</td>
+              <td>+91 XXXXX XXXXX</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Financial Analytics Section -->
+    <div class="dashboard-section" id="finance">
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Monthly Revenue Target</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-target"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹8.5L</div>
+          <div class="metric-change positive">
+            <i class="fas fa-calendar"></i>
+            <span>Year 1 Goal</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Profit Margin Target</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-percentage"></i>
+            </div>
+          </div>
+          <div class="metric-value">25%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-chart-line"></i>
+            <span>Industry leading</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Working Capital</div>
+            <div class="metric-icon" style="background: var(--info);">
+              <i class="fas fa-wallet"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹10L</div>
+          <div class="metric-change positive">
+            <i class="fas fa-shield-alt"></i>
+            <span>Buffer ready</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Customer Acquisition Cost</div>
+            <div class="metric-icon" style="background: var(--primary);">
+              <i class="fas fa-user-plus"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹12K</div>
+          <div class="metric-change positive">
+            <i class="fas fa-arrow-down"></i>
+            <span>Target: Below ₹15K</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-container">
+          <h3 class="chart-title">Revenue Projection (5 Years)</h3>
+          <canvas id="revenueProjection" width="400" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3 class="chart-title">Cost Breakdown</h3>
+          <canvas id="costBreakdown" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Financial Milestones</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Revenue Target</th>
+              <th>Installations</th>
+              <th>Net Profit</th>
+              <th>Team Size</th>
+              <th>Market Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background: #f0f9f0;">
+              <td><strong>Year 1</strong></td>
+              <td><strong>₹8.5 Cr</strong></td>
+              <td>250</td>
+              <td>₹1.2 Cr (14%)</td>
+              <td>15 people</td>
+              <td>2%</td>
+            </tr>
+            <tr>
+              <td><strong>Year 2</strong></td>
+              <td><strong>₹22.3 Cr</strong></td>
+              <td>600</td>
+              <td>₹4.5 Cr (20%)</td>
+              <td>35 people</td>
+              <td>5%</td>
+            </tr>
+            <tr>
+              <td><strong>Year 3</strong></td>
+              <td><strong>₹48.7 Cr</strong></td>
+              <td>1,200</td>
+              <td>₹12.2 Cr (25%)</td>
+              <td>80 people</td>
+              <td>12%</td>
+            </tr>
+            <tr>
+              <td><strong>Year 4</strong></td>
+              <td><strong>₹89.5 Cr</strong></td>
+              <td>2,000</td>
+              <td>₹26.8 Cr (30%)</td>
+              <td>150 people</td>
+              <td>18%</td>
+            </tr>
+            <tr style="background: #e6f7e6;">
+              <td><strong>Year 5</strong></td>
+              <td><strong>₹142.6 Cr</strong></td>
+              <td>3,000</td>
+              <td>₹49.9 Cr (35%)</td>
+              <td>250 people</td>
+              <td>25%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Customer Success Section -->
+    <div class="dashboard-section" id="customer">
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Customer Satisfaction</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-smile"></i>
+            </div>
+          </div>
+          <div class="metric-value">5.0</div>
+          <div class="metric-change positive">
+            <i class="fas fa-star"></i>
+            <span>Target rating</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Referral Rate</div>
+            <div class="metric-icon" style="background: var(--primary);">
+              <i class="fas fa-share-alt"></i>
+            </div>
+          </div>
+          <div class="metric-value">35%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-users"></i>
+            <span>Target: >30%</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Average Savings</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-piggy-bank"></i>
+            </div>
+          </div>
+          <div class="metric-value">₹3.2K</div>
+          <div class="metric-change positive">
+            <i class="fas fa-calendar"></i>
+            <span>Monthly per customer</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">System Performance</div>
+            <div class="metric-icon" style="background: var(--info);">
+              <i class="fas fa-bolt"></i>
+            </div>
+          </div>
+          <div class="metric-value">92%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-chart-line"></i>
+            <span>Of predicted output</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Customer Feedback & Reviews</h3>
+          <div class="table-actions">
+            <button class="btn btn-primary">
+              <i class="fas fa-star"></i> Request Review
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Installation Date</th>
+              <th>System Size</th>
+              <th>Monthly Savings</th>
+              <th>Rating</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="6" style="text-align: center; color: #6b7280; padding: 40px;">
+                Complete your first installation to see customer feedback! 🌟
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AI Insights Section -->
+    <div class="dashboard-section" id="ai-insights">
+      <div class="cards-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">AI Recommendations</div>
+            <div class="metric-icon" style="background: var(--info);">
+              <i class="fas fa-brain"></i>
+            </div>
+          </div>
+          <div class="metric-value">12</div>
+          <div class="metric-change positive">
+            <i class="fas fa-lightbulb"></i>
+            <span>Active insights</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Market Analysis</div>
+            <div class="metric-icon" style="background: var(--warning);">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+          </div>
+          <div class="metric-value">Daily</div>
+          <div class="metric-change positive">
+            <i class="fas fa-sync-alt"></i>
+            <span>Auto-updated</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Lead Scoring</div>
+            <div class="metric-icon" style="background: var(--success);">
+              <i class="fas fa-target"></i>
+            </div>
+          </div>
+          <div class="metric-value">AI</div>
+          <div class="metric-change positive">
+            <i class="fas fa-robot"></i>
+            <span>Powered</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-title">Predictive Analytics</div>
+            <div class="metric-icon" style="background: var(--primary);">
+              <i class="fas fa-crystal-ball"></i>
+            </div>
+          </div>
+          <div class="metric-value">95%</div>
+          <div class="metric-change positive">
+            <i class="fas fa-accuracy"></i>
+            <span>Accuracy</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">🤖 AI Business Recommendations</h3>
+          <div class="table-actions">
+            <button class="btn btn-primary" onclick="openAIAssistant()">
+              <i class="fas fa-brain"></i> Get AI Guidance
+            </button>
+          </div>
+        </div>
+        <table>
+          <tbody>
+            <tr>
+              <td style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div style="background: var(--success); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-bullseye"></i>
+                  </div>
+                  <div>
+                    <h4 style="color: var(--dark);">Focus on Gachibowli Area First</h4>
+                    <p style="margin: 0; color: #6b7280;">High income households, tech professionals, environmentally conscious</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div style="background: var(--warning); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-rupee-sign"></i>
+                  </div>
+                  <div>
+                    <h4 style="color: var(--dark);">Optimal Pricing: ₹68,000 per kW</h4>
+                    <p style="margin: 0; color: #6b7280;">Balances competitiveness with 25% profit margin in Hyderabad market</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div style="background: var(--info); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-calendar-alt"></i>
+                  </div>
+                  <div>
+                    <h4 style="color: var(--dark);">Best Installation Months: Oct-Mar</h4>
+                    <p style="margin: 0; color: #6b7280;">Hyderabad weather is optimal, customer demand peaks during this period</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div style="background: var(--primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-handshake"></i>
+                  </div>
+                  <div>
+                    <h4 style="color: var(--dark);">Partner with Real Estate Developers</h4>
+                    <p style="margin: 0; color: #6b7280;">New constructions in HITEC City offer bulk installation opportunities</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="dashboard-section" id="settings">
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Business Configuration</h3>
+        </div>
+        <div style="padding: 25px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+              <h4 style="margin-bottom: 15px; color: var(--dark);">Company Information</h4>
+              <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input type="text" class="form-input" value="PowerAura Solar Solutions" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Owner Name</label>
+                <input type="text" class="form-input" value="Jinudev.C" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact Number</label>
+                <input type="text" class="form-input" value="+91 8143 351 265" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Business Location</label>
+                <input type="text" class="form-input" value="Hyderabad, Telangana" readonly>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 15px; color: var(--dark);">Business Targets</h4>
+              <div class="form-group">
+                <label class="form-label">Year 1 Revenue Target</label>
+                <input type="text" class="form-input" value="₹8.5 Crore">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Monthly Installation Target</label>
+                <input type="number" class="form-input" value="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Team Size Goal</label>
+                <input type="number" class="form-input" value="15">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Market Focus</label>
+                <select class="form-select">
+                  <option>Hyderabad Metro</option>
+                  <option>Telangana State</option>
+                  <option>South India</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <button class="btn btn-primary">
+              <i class="fas fa-save"></i> Save Settings
+            </button>
+            <button class="btn btn-secondary" style="margin-left: 10px;">
+              <i class="fas fa-undo"></i> Reset to Defaults
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3 class="table-title">Partnership Status</h3>
+        </div>
+        <div style="padding: 25px; text-align: center;">
+          <div style="background: linear-gradient(45deg, var(--success), var(--primary)); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px;">
+            <i class="fas fa-handshake" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3>AI Partnership Active</h3>
+            <p style="margin: 10px 0; opacity: 0.9;">Your AI business partner is ready to guide you to ₹150 crore success!</p>
+            <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-top: 20px;">
+              <p><strong>Partnership Benefits:</strong></p>
+              <p>✓ 24/7 Business Guidance • ✓ Market Analysis • ✓ Lead Optimization • ✓ Strategic Planning</p>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="openAIAssistant()">
+            <i class="fas fa-robot"></i> Chat with Your AI Partner
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AI Assistant Modal -->
+<div class="ai-modal" id="aiModal">
+  <div class="ai-modal-content">
+    <div class="ai-modal-header">
+      <div>
+        <h3><i class="fas fa-robot"></i> Your AI Business Partner</h3>
+        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Jinudev, let's achieve ₹150 crore together!</p>
+      </div>
+      <button onclick="closeAIAssistant()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="ai-chat" id="aiChat">
+      <div class="ai-message assistant">
+        <strong>🤖 Your AI Partner:</strong> Hey Jinudev! Congratulations on taking this huge step! I'm here as your dedicated business partner to guide you from startup to ₹150 crore success in Hyderabad's solar market.
+        <br><br>
+        <strong>Here's how I'll help you:</strong>
+        <br>
+        • <strong>Lead Qualification</strong> - Which prospects to prioritize for maximum ROI
+        • <strong>Pricing Strategy</strong> - Perfect pricing for Hyderabad market (currently ₹68k/kW optimal)
+        • <strong>Installation Planning</strong> - Best practices, timelines, team management
+        • <strong>Market Intelligence</strong> - Real-time Telangana market insights
+        • <strong>Growth Strategy</strong> - Step-by-step path to dominate Hyderabad
+        • <strong>Financial Planning</strong> - Cash flow, funding, scaling decisions
+        <br><br>
+        <strong>Ready to get your domain live and start generating leads?</strong> What's your first question, partner? 🚀
+      </div>
+    </div>
+    <div class="ai-input">
+      <input type="text" id="aiInputField" placeholder="Ask your AI partner anything..." />
+      <button class="btn btn-primary" onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  // Enhanced AI responses for Jinudev's business
+  const aiResponses = {
+    'domain': 'For your domain, I recommend: 1) poweraurasolar.com (premium), 2) jinudevsolarsolutions.com (personal brand), or 3) hyderabadsolarexpert.com (local SEO). Go for .com for credibility. Need help with hosting recommendations?',
+    'leads': 'Start with Gachibowli apartments - target monthly bills >₹4,000. Create a simple landing page with your solar calculator. I predict 15-20 quality leads/month from Google Ads (budget: ₹25k/month). Want me to draft your first ad copy?',
+    'pricing': 'Hyderabad sweet spot: ₹68k per kW for residential (25% margin), ₹62k for commercial bulk (20% margin). With MNRE subsidies, customer pays ₹40k for 3kW system. This beats competition while maintaining profitability.',
+    'team': 'Month 1: You + 2 installers + 1 sales person. Month 6: Add project manager + marketing person. Year 1: 15 people total. I recommend starting with contract installers to minimize fixed costs.',
+    'funding': 'You need ₹8-10 lakhs working capital for first 3 months. Consider: 1) Personal savings + family loan, 2) MUDRA loan (₹10L), 3) Local investor (give 15-20% equity). Avoid bank loans initially - too much paperwork.',
+    'competition': 'Main competitors: Zytech Solar, Fourth Partner Energy. Your advantage: Personal service + AI optimization + local focus. Price competitively but emphasize quality and post-installation support.',
+    'installation': '2-day standard for residential: Day 1 - mounting & panels, Day 2 - electrical & commissioning. Start 8 AM, finish by 5 PM. Hyderabad permits take 15-20 days, so apply early.',
+    'growth': 'Month 1-3: Get first 10 customers (validate model), Month 4-6: Scale to 20 installations/month, Month 7-12: Team expansion + second city. Focus on cashflow over growth initially.',
+    'marketing': 'Best channels for Hyderabad: 1) Google Ads (40% budget), 2) Apartment society presentations (30%), 3) Facebook/Instagram (20%), 4) Referrals (10%). ROI tracking is crucial.',
+    'default': 'Jinudev, I\'m here to help with any aspect of building your solar empire! Ask about: domain setup, lead generation, pricing, team building, funding, competition, installations, growth strategy, or marketing. What\'s your priority right now?'
+  };
+
+  // Lead storage
+  let leads = JSON.parse(localStorage.getItem('poweraura_leads') || '[]');
+  let totalLeads = leads.length;
+  let hotLeads = leads.filter(lead => lead.priority === 'High - Hot Lead').length;
+
+  // Initialize dashboard
+  function init() {
+    setupNavigation();
+    updateLeadMetrics();
+    setupCharts();
+    setupAI();
+    
+    // Auto-save leads
+    setInterval(saveLeads, 30000); // Save every 30 seconds
+  }
+
+  // Navigation setup
+  function setupNavigation() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = item.dataset.section;
+        
+        // Update active nav
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Show section
+        document.querySelectorAll('.dashboard-section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(section).classList.add('active');
+        
+        // Update title
+        const titles = {
+          overview: 'Business Overview',
+          leads: 'Lead Management',
+          projects: 'Project Pipeline',
+          installations: 'Installation Tracking',
+          inventory: 'Inventory Management',
+          finance: 'Financial Analytics',
+          customer: 'Customer Success',
+          'ai-insights': 'AI Insights',
+          settings: 'Settings'
+        };
+        document.getElementById('pageTitle').textContent = titles[section];
+      });
+    });
+  }
+
+  // Add lead functionality
+  window.addLead = () => {
+    const name = document.getElementById('leadName').value.trim();
+    const phone = document.getElementById('leadPhone').value.trim();
+    const bill = document.getElementById('leadBill').value.trim();
+    const source = document.getElementById('leadSource').value;
+    const property = document.getElementById('leadProperty').value;
+    const area = document.getElementById('leadArea').value;
+    const priority = document.getElementById('leadPriority').value;
+
+    if (!name || !phone || !bill) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Calculate solar potential
+    const monthlyBill = parseFloat(bill);
+    const telanganaRate = 7.0; // ₹/kWh
+    const systemSize = ((monthlyBill / telanganaRate) / 30) / 4.5; // kW
+    const solarPotential = `${systemSize.toFixed(1)} kW`;
+
+    const lead = {
+      id: Date.now(),
+      name,
+      phone,
+      bill: `₹${bill}`,
+      source,
+      property,
+      area,
+      priority,
+      solarPotential,
+      status: 'New',
+      dateAdded: new Date().toLocaleDateString()
     };
 
-    // Initialize slider values
-    document.getElementById('peakSunHoursValue').textContent = document.getElementById('peakSunHours').value + " hours";
-    document.getElementById('systemEfficiencyValue').textContent = document.getElementById('systemEfficiency').value + "%";
-    document.getElementById('unitRateValue').textContent = "₹" + document.getElementById('unitRate').value + " per unit";
+    leads.unshift(lead); // Add to beginning
+    saveLeads();
+    updateLeadTable();
+    updateLeadMetrics();
 
-    // Set initial state rate
-    document.getElementById('unitRate').value = stateRates["Andhra Pradesh"];
-    document.getElementById('unitRateValue').textContent = "₹" + stateRates["Andhra Pradesh"].toFixed(2) + " per unit";
+    // Clear form
+    document.getElementById('leadName').value = '';
+    document.getElementById('leadPhone').value = '';
+    document.getElementById('leadBill').value = '';
 
-    // State change handler
-    document.getElementById('state').addEventListener('change', function () {
-      const defaultRate = stateRates[this.value] || 6.0;
-      document.getElementById('unitRate').value = defaultRate;
-      document.getElementById('unitRateValue').textContent = `₹${defaultRate.toFixed(2)} per unit`;
-    });
+    // Show success message
+    alert(`✅ Lead added successfully!\n\nCustomer: ${name}\nSolar Potential: ${solarPotential}\nEstimated System Cost: ₹${(systemSize * 68000).toFixed(0)}\n\nAI Recommendation: ${priority === 'High - Hot Lead' ? 'Call within 2 hours!' : 'Follow up within 24 hours'}`);
+  };
 
-    // Slider event handlers
-    document.getElementById('unitRate').addEventListener('input', function () {
-      document.getElementById('unitRateValue').textContent = `₹${parseFloat(this.value).toFixed(2)} per unit`;
-    });
+  // Update lead metrics
+  function updateLeadMetrics() {
+    totalLeads = leads.length;
+    hotLeads = leads.filter(lead => lead.priority === 'High - Hot Lead').length;
+    const qualified = leads.filter(lead => lead.status === 'Qualified').length;
+    const conversionRate = totalLeads > 0 ? ((qualified / totalLeads) * 100).toFixed(1) : 0;
 
-    document.getElementById('peakSunHours').addEventListener('input', function () {
-      document.getElementById('peakSunHoursValue').textContent = this.value + " hours";
-    });
+    document.getElementById('totalLeads').textContent = totalLeads;
+    document.getElementById('hotLeads').textContent = hotLeads;
+    document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+  }
 
-    document.getElementById('systemEfficiency').addEventListener('input', function () {
-      document.getElementById('systemEfficiencyValue').textContent = this.value + '%';
-    });
-
-    // Handle unit conversion
-    function convertToKilowatts(value, unit) {
-      switch(unit) {
-        case 'W':
-          return value / 1000; // Convert watts to kilowatts
-        case 'kW':
-          return value; // Already in kilowatts
-        case 'MW':
-          return value * 1000; // Convert megawatts to kilowatts
-        default:
-          return value;
-      }
+  // Update lead table
+  function updateLeadTable() {
+    const tbody = document.getElementById('leadsTableBody');
+    
+    if (leads.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
+            No leads yet. Add your first lead above! 🚀
+          </td>
+        </tr>
+      `;
+      return;
     }
 
-    function handleUnitChange(unit) {
-      const input = document.getElementById('annualUsage');
-      const value = parseFloat(input.value);
-      if (!isNaN(value)) {
-        switch(unit) {
-          case 'W':
-            input.placeholder = 'e.g. 5000000'; // 5000000W = 5000kW
-            break;
-          case 'kW':
-            input.placeholder = 'e.g. 5000'; // 5000kW
-            break;
-          case 'MW':
-            input.placeholder = 'e.g. 5'; // 5MW = 5000kW
-            break;
+    tbody.innerHTML = leads.map(lead => `
+      <tr>
+        <td><strong>${lead.name}</strong><br><small>${lead.dateAdded}</small></td>
+        <td><a href="tel:${lead.phone}">${lead.phone}</a><br><small>${lead.area}</small></td>
+        <td>${lead.area}</td>
+        <td><strong>${lead.bill}</strong></td>
+        <td><strong>${lead.solarPotential}</strong><br><small>Est: ₹${(parseFloat(lead.solarPotential) * 68000).toFixed(0)}</small></td>
+        <td><span class="status-badge ${lead.priority.includes('High') ? 'status-new' : lead.priority.includes('Medium') ? 'status-proposal' : 'status-qualified'}">${lead.priority.split(' - ')[0]}</span></td>
+        <td>
+          <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="callLead('${lead.phone}')">
+            <i class="fas fa-phone"></i> Call
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Call lead function
+  window.callLead = (phone) => {
+    if (confirm(`Call ${phone}?\n\nTip: Mention their potential savings and schedule a site visit!`)) {
+      window.open(`tel:${phone}`);
+    }
+  };
+
+  // Save leads to localStorage
+  function saveLeads() {
+    localStorage.setItem('poweraura_leads', JSON.stringify(leads));
+  }
+
+  // Quick lead function
+  window.addQuickLead = () => {
+    document.querySelector('[data-section="leads"]').click();
+    document.getElementById('leadName').focus();
+  };
+
+  // Setup charts
+  function setupCharts() {
+    // Revenue projection chart
+    const revCtx = document.getElementById('revenueProjection');
+    if (revCtx) {
+      new Chart(revCtx.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+          datasets: [{
+            label: 'Revenue (₹ Crore)',
+            data: [8.5, 22.3, 48.7, 89.5, 142.6],
+            borderColor: '#0a7a07',
+            backgroundColor: 'rgba(10, 122, 7, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          },
+          plugins: {
+            legend: { display: false }
+          }
         }
-      }
+      });
     }
 
-    // Calculate button handler
-    document.getElementById('calculateBtn').addEventListener('click', function () {
-      const inputValue = parseFloat(document.getElementById('annualUsage').value);
-      const unit = document.getElementById('usageUnit').value;
-      const annualUsage = convertToKilowatts(inputValue, unit);
-      const panelWattage = getPanelWattage();
-      const peakSunHours = parseFloat(document.getElementById('peakSunHours').value);
-      const systemEfficiency = parseFloat(document.getElementById('systemEfficiency').value) / 100;
-      const unitRate = parseFloat(document.getElementById('unitRate').value);
+    // Cost breakdown chart
+    const costCtx = document.getElementById('costBreakdown');
+    if (costCtx) {
+      new Chart(costCtx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Equipment (60%)', 'Installation (15%)', 'Marketing (10%)', 'Operations (10%)', 'Profit (25%)'],
+          datasets: [{
+            data: [60, 15, 10, 10, 25],
+            backgroundColor: ['#0a7a07', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+  }
 
-      if (isNaN(annualUsage) || annualUsage <= 0) {
-        alert("Please enter valid electricity usage.");
-        return;
+  // AI Assistant functionality
+  function setupAI() {
+    document.getElementById('aiInputField').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
+
+  window.openAIAssistant = () => {
+    document.getElementById('aiModal').classList.add('active');
+  };
+
+  window.closeAIAssistant = () => {
+    document.getElementById('aiModal').classList.remove('active');
+  };
+
+  window.sendMessage = () => {
+    const input = document.getElementById('aiInputField');
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chat = document.getElementById('aiChat');
+    
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'ai-message user';
+    userMsg.innerHTML = `<strong>Jinudev:</strong> ${message}`;
+    chat.appendChild(userMsg);
+
+    // Generate AI response
+    let response = aiResponses.default;
+    Object.keys(aiResponses).forEach(key => {
+      if (message.toLowerCase().includes(key)) {
+        response = aiResponses[key];
       }
-
-      // Perform precise solar calculations
-      // Temperature coefficient loss (avg -0.35%/°C above 25°C, assuming 45°C peak temp)
-      const tempCoeffLoss = 0.0035 * (45 - 25); // 7% loss at 45°C
-      
-      // Detailed losses calculation
-      const soilingLoss = 0.03; // 3% loss due to dust and dirt
-      const wiringLoss = 0.02; // 2% DC wiring loss
-      const inverterLoss = 0.04; // 4% inverter conversion loss
-      const lightInducedDegradation = 0.02; // 2% LID loss
-      const mismatchLoss = 0.01; // 1% panel mismatch loss
-      
-      // Total system losses (including user-defined efficiency)
-      const totalEfficiency = (1 - (tempCoeffLoss + soilingLoss + wiringLoss + 
-                                  inverterLoss + lightInducedDegradation + mismatchLoss)) * 
-                                  (systemEfficiency);
-      
-      // Calculate daily production per panel (kWh)
-      const dailyProductionPerPanel = (panelWattage * peakSunHours * totalEfficiency) / 1000;
-      
-      // Calculate annual production per panel (kWh)
-      const annualProductionPerPanel = dailyProductionPerPanel * 365;
-      
-      // Calculate required number of panels
-      const panelCount = Math.ceil(annualUsage / annualProductionPerPanel);
-      
-      // Calculate system size in kW (DC)
-      const systemSize = (panelCount * panelWattage / 1000).toFixed(2);
-      
-      // Calculate estimated annual production with all losses
-      const estimatedProduction = Math.round(panelCount * annualProductionPerPanel);
-      
-      // Calculate required roof space (assuming 2m² per panel for modern high-efficiency panels)
-      const roofSpace = Math.ceil(panelCount * 21.5); // 21.5 sq ft per panel including spacing
-      const yearlySavings = '₹' + Math.round(annualUsage * unitRate);
-
-      // Update results
-      document.getElementById('panelCount').textContent = panelCount;
-      document.getElementById('systemSize').textContent = `${systemSize} kW`;
-      document.getElementById('annualProduction').textContent = `${estimatedProduction} kWh`;
-      document.getElementById('roofSpace').textContent = `${roofSpace} sq ft`;
-      document.getElementById('yearlySavings').textContent = yearlySavings;
-
-      // Show results with animation
-      document.getElementById('resultsSection').style.display = 'block';
-      
-      // Scroll to results
-      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Handle panel wattage selection and custom input
-    function handleWattageChange(value) {
-      const customInput = document.getElementById('customWattage');
-      const errorDiv = document.getElementById('wattageError');
-      
-      if (value === 'custom') {
-        customInput.style.display = 'block';
-        customInput.value = '';
-        customInput.focus();
-      } else {
-        customInput.style.display = 'none';
-        errorDiv.style.display = 'none';
-      }
+    // Add context-aware responses
+    if (message.toLowerCase().includes('jinudev') || message.toLowerCase().includes('partner')) {
+      response = `Absolutely, Jinudev! ${response} Remember, we're in this together - every challenge is an opportunity to grow your solar empire in Hyderabad! 💪`;
     }
 
-    function validateCustomWattage(value) {
-      const errorDiv = document.getElementById('wattageError');
-      const numValue = parseInt(value);
-      
-      if (numValue < 100 || numValue > 1000) {
-        errorDiv.style.display = 'block';
-        return false;
-      } else {
-        errorDiv.style.display = 'none';
-        return true;
-      }
-    }
+    // Add AI response with delay
+    setTimeout(() => {
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'ai-message assistant';
+      aiMsg.innerHTML = `<strong>🤖 Your AI Partner:</strong> ${response}`;
+      chat.appendChild(aiMsg);
+      chat.scrollTop = chat.scrollHeight;
+    }, 1000);
 
-    // Update the calculator to use either dropdown or custom value
-    function getPanelWattage() {
-      const select = document.getElementById('panelWattageSelect');
-      if (select.value === 'custom') {
-        const customValue = document.getElementById('customWattage').value;
-        return validateCustomWattage(customValue) ? parseFloat(customValue) : 350;
-      }
-      return parseFloat(select.value);
-    }
-  </script>
+    input.value = '';
+    chat.scrollTop = chat.scrollHeight;
+  };
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    init();
+    updateLeadTable();
+  });
+
+})();
+</script>
+
 </body>
 </html>
